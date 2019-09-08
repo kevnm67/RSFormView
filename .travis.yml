@@ -1,28 +1,70 @@
+os: osx
+osx_image: xcode10.2
+rvm: 2.6.0
+
+cache: bundler
+
+branches:
+  only:
+    - master
+    - develop
+  except:
+    - "/^[^\\/]+\\/\\d+(?:\\.\\d+)+\\/\\d+$/"
+
 env:
   global:
+    - WORKSPACE=RSFormView.xcworkspace
+    - SCHEME="RSFormViewExampleApp"
+    - IOS_SDK=iphonesimulator12.1
+    - LC_CTYPE=en_US.UTF-8 LANG=en_US.UTF-8
     - CC_TEST_REPORTER_ID: 2c577f1942e1a4835d5c2941900b485be7c5912ec2bd7eac4bccb9253f2b0ee1
     - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
-language: swift
-xcode_workspace: RSFormView.xcworkspace
-xcode_scheme: RSFormViewExampleApp
-osx_image: xcode10.2
-cache:
-  - bundler
-  - cocoapods
+
 before_install:
+  - gem install bundler
+  - bundle install --without=documentation
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
-  - gem install cocoapods -v '1.7.5'
-  - cd Example
-  - pod repo update
-install:
-  - bundle install
-  - pod install
-script:
-  - set -o pipefail
-  - xcodebuild -workspace RSFormView.xcworkspace -scheme RSFormViewExampleApp -destination 'platform=iOS Simulator,name=iPhone Xs,OS=12.2' build test | xcpretty --test --color
-after_script:
-  - cd ..
-  - slather coverage
-  - ./cc-test-reporter after-build -t cobertura --exit-code $TRAVIS_TEST_RESULT
+
+jobs:
+  include:
+    - &test
+      stage: test
+      name: iOS 12.2 iPhoneXs
+      osx_image: xcode10.2
+      podfile: Example/
+      env:
+        - DESTINATION="OS=12.2,name=iPhone Xs"
+        - SDK="$IOS_SDK"
+      before_script:
+        - "./cc-test-reporter before-build"
+      script:
+        - set -o pipefail
+        - xcodebuild -version -sdk
+        - xcodebuild clean build test -workspace "$WORKSPACE" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -enableCodeCoverage YES ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | bundle exec xcpretty -c;
+      after_success:
+        - cd ..
+        - slather coverage
+        - ./cc-test-reporter after-build -t cobertura --exit-code $TRAVIS_TEST_RESULT
+
+    - <<: *test
+      name: iOS 11.4 iPhoneX
+      env:
+        - DESTINATION="OS=11.4,name=iPhone X"
+        - SDK="$IOS_SDK"
+
+    - <<: *test
+      name: iOS 13.0
+      osx_image: xcode11
+      env:
+        - DESTINATION="OS=13.0,name=iPhone X"
+        - SDK="iphonesimulator13.0"
+      if: "(commit_message !=~ /(@skip ios13)/)"
+
+    - stage: lint
+      name: pod lint
+      script: bundle exec pod lib lint
+
+stages:
+  - test
+  - lint
