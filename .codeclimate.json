@@ -1,0 +1,31 @@
+{
+  "version": "2",
+  "plugins": {
+    "swiftlint": {
+      "enabled": true
+    },
+    "bundler-audit": {
+      "enabled": true
+    }
+  },
+  "exclude_patterns": [
+    "Example/Pods/",
+    "Example/RSFormViewExampleAppUITests/"
+  ],
+  "checks": {
+    "identical-code": {
+      "config": {
+        "threshold": 25
+      }
+    },
+    "duplication": {
+      "config": {
+        "languages": {
+          "swift": {
+            "mass_threshold": 25
+          }
+        }
+      }
+    }
+  }
+}

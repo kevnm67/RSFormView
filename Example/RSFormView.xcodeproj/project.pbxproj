@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -133,7 +133,6 @@
 				86866CB70EB37070321B894A /* Pods-RSFormViewExampleApp.debug.xcconfig */,
 				81DA92B4EFC698D28CC15FB4 /* Pods-RSFormViewExampleApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

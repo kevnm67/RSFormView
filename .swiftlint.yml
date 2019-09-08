@@ -1,0 +1,44 @@
+included:
+  - RSFormView
+
+excluded:
+  - Example/Pods/
+
+disabled_rules:
+  - type_name
+  - identifier_name
+  - trailing_whitespace
+
+opt_in_rules:
+  - anyobject_protocol
+  - contains_over_first_not_nil
+  - discouraged_object_literal
+  - discouraged_optional_boolean
+  - empty_count
+  - empty_string
+  - empty_xctest_method
+  - explicit_init
+  - first_where
+  - force_unwrapping
+  - last_where
+  - sorted_first_last
+  - static_operator
+  - unavailable_function
+  - xct_specific_matcher
+  - yoda_condition
+
+analyzer_rules:
+  - unused_import
+  - unused_private_declaration
+
+function_body_length: 250
+
+cyclomatic_complexity: 15
+
+line_length: 200
+
+file_length: 600
+
+type_body_length: 500
+
+reporter: "json"
