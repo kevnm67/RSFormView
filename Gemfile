@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
+gem 'cocoapods'
 gem 'slather'
-gem 'cocoapods', '~> 1.7.5'
+gem 'xcpretty'
+gem 'xcpretty-json-formatter'

@@ -1,5 +1,6 @@
 os: osx
 osx_image: xcode10.3
+language: swift
 rvm: 2.6.0
 
 cache:
@@ -32,11 +33,10 @@ jobs:
   include:
     - &test
       stage: test
-      name: iOS 12.4
+      name: iOS 12.4/iPhone Xs
       osx_image: xcode10.3
       podfile: Example/
       env:
-        - SDK="$IOS_SDK"
         - DESTINATION="OS=12.4,name=iPhone Xs"
       before_script:
         - "./cc-test-reporter before-build"
@@ -44,26 +44,22 @@ jobs:
         - cd Example
         - set -o pipefail
         - xcodebuild -version -sdk
-        - xcodebuild clean build test -workspace "$WORKSPACE" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -enableCodeCoverage YES ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | bundle exec xcpretty -c;
+        - xcodebuild build test -workspace "$WORKSPACE" -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES | bundle exec xcpretty -c;
       after_success:
         - cd ..
         - slather coverage
         - ./cc-test-reporter after-build -t cobertura --exit-code $TRAVIS_TEST_RESULT
 
     - <<: *test
-      name: iOS 11.4 iPhoneX
+      name: iOS 11.4/iPhoneX
       env:
-        - SDK_OS="11.4"
-        - IOS_SIMULATOR="iPhone X"
+        - DESTINATION="OS=11.4,name=iPhone X"
 
     - <<: *test
-      name: iOS 13.0
+      name: iOS 13.0/iPhone Xs Max
       osx_image: xcode11
       env:
-        - SDK_OS="13.0"
-        - IOS_SIMULATOR="iPhone Xs"
-        - DESTINATION="OS=13.0,name=iPhone X"
-        - SDK="iphonesimulator13.0"
+        - DESTINATION="OS=13.0,name=iPhone Xs Max"
       if: "(commit_message =~ /(@test 13.0)/)"
 
     - stage: lint
